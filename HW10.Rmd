@@ -1,0 +1,114 @@
+---
+title: "HW10"
+author: "Asim Waheed"
+date: "2024-04-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+***Problem 1***
+*
+```{r, echo=FALSE}
+redlining <- read.csv("C:/Users/asimw/Downloads/redlining.csv")
+correlation_value <- cor(redlining$minority, redlining$policies, method = "pearson")
+print(correlation_value)
+```
+
+***Question: What question are you trying to answer?***
+
+***We are trying to answer whether there is a statistically significant relationship between the percentage of the minority population in a ZIP code area and the number of insurance policies held in that area.***
+
+***Approach: What approach/statistical tool did you use to answer the question?***
+
+***To answer this question, we will use correlation analysis to understand if there is a linear relationship between the two variables: minority and policies. The Pearson correlation coefficient will be calculated to quantify the degree of correlation.***
+
+***Evidence/Results:***
+
+***The correlation coefficient of 0.719 suggests a strong positive relationship between the two variables. This means that as the percentage of the minority population in a ZIP code area increases, there is a tendency for the number of insurance policies to also increase. However, it is important to note that correlation does not imply causation. Further analysis would be required to understand if there are underlying factors or to establish any causal relationship.***
+
+
+***Problem 2***
+
+***Part A***
+
+```{r, echo=FALSE}
+library(tidyverse)
+
+groceries <- read.csv("C:/Users/asimw/Downloads/groceries.csv")
+
+# Wrangle the data to find the average price per store
+average_prices <- groceries %>%
+  group_by(Store) %>%
+  summarise(Average_Price = mean(Price, na.rm = TRUE))
+
+# Create a bar graph
+ggplot(average_prices, aes(x = reorder(Store, -Average_Price), y = Average_Price)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "Store", y = "Average Price", caption = "Average price of products by store") +
+  theme_minimal()
+```
+
+***Part B***
+
+```{r, echo=FALSE}
+# Count the number of stores that sell each product
+product_availability <- groceries %>%
+  group_by(Product) %>%
+  summarise(Stores_Selling = n_distinct(Store))
+
+# Create a bar graph
+ggplot(product_availability, aes(x = reorder(Product, -Stores_Selling), y = Stores_Selling)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "Product", y = "Number of Stores Selling", caption = "Number of stores selling each product") +
+  theme_minimal()
+```
+
+***Part C***
+
+```{r, echo=FALSE}
+# Fit the model
+model_type <- lm(Price ~ Product + Type, data = groceries)
+
+# Summary of the model to view coefficients
+summary(model_type)
+
+# Calculate confidence intervals for the 'Type' variable
+confint(model_type, "Type", level = 0.95)
+```
+
+***Part D***
+
+```{r, echo=FALSE}
+# Fit the model
+model_store <- lm(Price ~ Product + Store, data = groceries)
+
+# Summary of the model to view coefficients
+summary(model_store)
+```
+
+***ProductJustin's Almond Butter and Product Sprite 12 pack
+
+***Part E***
+
+```{r, echo=FALSE}
+coef(model_store)
+```
+
+***Part F***
+
+```{r, echo=FALSE}
+# Create Income10K variable
+data <- groceries %>%
+  mutate(Income10K = Income / 10000)
+
+# Fit the model
+model_income <- lm(Price ~ Product + Income10K, data = data)
+
+# Summary of the model to view standardized coefficients
+summary(model_income)
+```
